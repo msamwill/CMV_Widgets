@@ -9,7 +9,7 @@ This widget is very similar to the the find widget.  It is a copy of the find wi
 ##Description:
 Allows user to Search feature classes and display multiple fields in grid.  Screen shot:
  
-![URL Field](https://github.com/msamwill/CMV_Widgets/blob/master/README.md)
+![URL Field](https://github.com/msamwill/CMV_Widgets/blob/master/screenshot.png)
  
 
 ##Usage 
