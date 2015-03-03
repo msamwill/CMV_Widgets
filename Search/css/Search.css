@@ -1,0 +1,74 @@
+.gis_SearchDijit {
+    width: 100%;
+}
+.gis_SearchDijit .querySelect, .gis_SearchDijit .searchText {
+	width:100%;
+	margin-bottom: 10px;
+}
+
+.gis_SearchDijit .containsCheck {
+	margin-bottom: 10px;
+	margin-left: 10px;
+}
+
+.gis_SearchDijit .clearButton {
+	float: right;
+}
+
+.gis_SearchDijit .searchIcon {
+    background-image: url(../images/search.png);
+    width: 16px;
+    height: 16px;
+}
+
+.gis_SearchDijit .clearIcon {
+    background-image: url(../images/clear.png);
+    width: 16px;
+    height: 16px;
+}
+
+.gis_SearchDijit label {
+	font-weight:bold;
+	margin-left: 5px;
+}
+
+.gis_SearchDijit .resultsContainer {
+	font-weight: bold;
+	margin: 10px;
+	display: none;
+}
+
+.gis_SearchDijit .dgrid {
+	/*height: 240px !important;
+	width:100%;*/
+	display: none;
+}
+
+.gis_SearchDijit .dgrid-grid {
+	height: 240px !important;
+	width:100%;
+	/*display: none;*/
+}
+
+.gis_SearchDijit .dgrid .dgrid-scroller {
+	margin-top: 35px !important;
+}
+
+.gis_SearchDijit .dgrid .dgrid-header th {
+	font-weight: bold;
+}
+
+.gis_SearchDijit .dgrid .dgrid-cell {
+	font-size: 11px;
+	padding: 8px !important;
+    width: 100px;
+	cursor: pointer;
+}
+
+.gis_SearchDijit .dgrid .field-JOIN_STRAP {
+	width: 120px;
+}
+
+.gis_SearchDijit .dgrid .field-foundFieldName {
+	display: none;
+}
