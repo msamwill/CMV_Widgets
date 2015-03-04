@@ -360,7 +360,7 @@ define([
 		    switch (geometry.type) {
 		        case 'point':
 		            // only add points to the map that have an X/Y
-		            if (feature.geometry.x && feature.geometry.y) {
+		            if (geometry.x && geometry.y) {
 		                graphic = new Graphic(geometry);
 		                this.pointGraphics.add(graphic);
 		            }

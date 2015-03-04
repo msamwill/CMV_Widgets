@@ -1,30 +1,28 @@
 define({
 	map: true,
 	queries: [
-	    {
-            description: 'Find A Fire Station Location By Name',
-            url: 'http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/PublicSafety/PublicSafetyOperationalLayers/MapServer/1',
-            where: "FDNAME LIKE '${0}%' ",
-            outFields: ["SITEID", "FDNAME", "ADDRESS"],
+	    { //one begins with train
+	        description: 'Find an Incident Point by Description',
+	        url: 'http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/PublicSafety/PublicSafetyOperationalLayers/MapServer/15',
+	        where: "Upper(DESCRIPTION) LIKE Upper('${0}%') ",
+	        outFields: ["FCODE", "DESCRIPTION"],
+	        dgridColumns: {
+	            FCODE: "INC TYPE",
+                DESCRIPTION: "DESC"
+	        },
+	        dgridSort: [{ attribute: "FCODE", descending: false }],
+	        minChars: 3
+	    },
+        { //one begins with I-64
+            description: 'Find a Traffic Camera by Description',
+            url: 'http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/PublicSafety/PublicSafetyOperationalLayers/MapServer/8',
+            where: "Upper(DESCRIP) LIKE Upper('${0}%') ",
+            outFields: ["DESCRIP", "URL"],
             dgridColumns: {
-                SITEID: "ID",
-                FDNAME: "NAME",
-                ADDRESS: "ADDRESS"
+                DESCRIP: "DESCRIPTION",
+                URL: "URL"
             },
-            dgridSort: [ {attribute: "NAME", descending: false}],
-            minChars: 3
-        },
-        {
-            description: 'Find A Police Station Location By Name',
-            url: 'http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/PublicSafety/PublicSafetyOperationalLayers/MapServer/2',
-            where: "FDNAME LIKE '${0}%' ",
-            outFields: ["SITEID", "PDNAME", "ADDRESS"],
-            dgridColumns: {
-                SITEID: "ID",
-                PDNAME: "NAME",
-                ADDRESS: "ADDRESS"
-            },
-            dgridSort: [ {attribute: "PDNAME", descending: false}],
+            dgridSort: [{ attribute: "DESCRIPTION", descending: false }],
             minChars: 3
         }
 		
