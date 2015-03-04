@@ -3,6 +3,7 @@ define({
 	queries: [
 	    { //one begins with train
 	        description: 'Find an Incident Point by Description',
+			// map service must contain a shape field 
 	        url: 'http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/PublicSafety/PublicSafetyOperationalLayers/MapServer/15',
 	        where: "Upper(DESCRIPTION) LIKE Upper('${0}%') ",
 	        outFields: ["FCODE", "DESCRIPTION"],
@@ -15,6 +16,7 @@ define({
 	    },
         { //one begins with I-64
             description: 'Find a Traffic Camera by Description',
+			// map service must contain a shape field
             url: 'http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/PublicSafety/PublicSafetyOperationalLayers/MapServer/8',
             where: "Upper(DESCRIP) LIKE Upper('${0}%') ",
             outFields: ["DESCRIP", "URL"],
