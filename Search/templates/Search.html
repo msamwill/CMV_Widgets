@@ -9,6 +9,9 @@
                 <label>${i18n.searchText.label}:</label><br/>
     			<input id="searchTextDijit" type="text" data-dojo-type="dijit/form/ValidationTextBox" data-dojo-attach-point="searchTextDijit" data-dojo-props="name:'searchText',uppercase:true,trim:true,required:true,value:'',placeholder:'${i18n.searchText.placeholder}','class':'searchText'" /><br/>
             </div>
+            <div id="searchTextHelp">
+                The '%' can be used as a wildcard to replace unknown portions of a your search text, e.g. Smi% J
+            </div>
             <div data-dojo-type="dijit/form/Button" data-dojo-props="busyLabel:'${i18n.searchButton.busyLabel}',iconClass:'fa fa-search fa-fw','class':'searchButton'" data-dojo-attach-event="onClick:search" data-dojo-attach-point="searchButtonDijit">
                 ${i18n.searchButton.label}
 			</div>

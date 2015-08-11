@@ -39,19 +39,22 @@
 }
 
 .gis_SearchDijit .dgrid {
-	/*height: 240px !important;
-	width:100%;*/
-	display: none;
-}
+        height: 240px !important;
+        width: 100%;
+        /*min-width: 200px;
+        max-width: 400px;*/
+        display: none;
+    }
 
-.gis_SearchDijit .dgrid-grid {
+/*.gis_SearchDijit .dgrid-grid {
 	height: 240px !important;
 	width:100%;
-	/*display: none;*/
-}
+    
+}*/
 
 .gis_SearchDijit .dgrid .dgrid-scroller {
 	margin-top: 35px !important;
+   
 }
 
 .gis_SearchDijit .dgrid .dgrid-header th {
@@ -61,14 +64,39 @@
 .gis_SearchDijit .dgrid .dgrid-cell {
 	font-size: 11px;
 	padding: 8px !important;
-    width: 100px;
-	cursor: pointer;
+    white-space: nowrap;
+    cursor: pointer;
+    width: 120px;
 }
 
-.gis_SearchDijit .dgrid .field-JOIN_STRAP {
+/*.gis_SearchDijit .dgrid .field-JOIN_STRAP {
+	width: 120px;
+}*/
+
+.gis_SearchDijit .WDTH120 {
 	width: 120px;
 }
 
-.gis_SearchDijit .dgrid .field-foundFieldName {
-	display: none;
+.gis_SearchDijit .WDTH100 {
+	width: 100px;
+}
+
+.gis_SearchDijit .PR40 {
+	width: 40%;
+}
+
+.gis_SearchDijit .PR35 {
+	width: 35%;
+}
+
+.gis_SearchDijit .PR35 {
+	width: 30%;
+}
+
+.gis_SearchDijit .PR25 {
+	width: 20%;
+}
+
+.gis_SearchDijit .PR20 {
+	width: 20%;
 }

@@ -12,8 +12,9 @@ define([
 	'dojo/store/Memory',
 	'dgrid/OnDemandGrid',
 	'dgrid/Selection',
-	'dgrid/Keyboard',
-   	'esri/layers/GraphicsLayer',
+    'dgrid/Keyboard',
+    'dgrid/extensions/ColumnResizer',
+    'esri/layers/GraphicsLayer',
 	'esri/graphic',
 	'esri/renderers/SimpleRenderer',
 	'esri/symbols/SimpleMarkerSymbol',
@@ -26,12 +27,13 @@ define([
 	'dojo/text!./Search/templates/Search.html',
 	'dojo/i18n!./Search/nls/resource',
     'dojo/string',
+    'dijit/Dialog',
     'dijit/form/Form',
 	'dijit/form/FilteringSelect',
 	'dijit/form/ValidationTextBox',
 	'dijit/form/CheckBox',
 	'xstyle/css!./Search/css/Search.css'
-], function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, aspect, domConstruct, lang, array, on, keys, Memory, OnDemandGrid, Selection, Keyboard, GraphicsLayer, Graphic, SimpleRenderer, SimpleMarkerSymbol, SimpleLineSymbol, SimpleFillSymbol, graphicsUtils, QueryTask, Query, Extent, SearchTemplate, i18n, String) {
+], function (declare, _WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin, aspect, domConstruct, lang, array, on, keys, Memory, OnDemandGrid, Selection, Keyboard, ColumnResizer, GraphicsLayer, Graphic, SimpleRenderer, SimpleMarkerSymbol, SimpleLineSymbol, SimpleFillSymbol, graphicsUtils, QueryTask, Query, Extent, SearchTemplate, i18n, String, Dialog) {
 	return declare([_WidgetBase, _TemplatedMixin, _WidgetsInTemplateMixin], {
 		widgetsInTemplate: true,
 		templateString: SearchTemplate,
@@ -40,16 +42,28 @@ define([
         
 	    lastselectedQuery: null,
 		lastSearchString: '',
-        stagedSearch: null,
+		stagedSearch: null,
+        lastSort: '',
+		//parcelid: "",
+		//_setParcelidAttr: function (value) {
+		//    //alert("in setparcel id = " + value);
+		//    this._set("parcelid", value);
+
+		//    if (this.parentWidget && !this.parentWidget.open) {
+		//        this.parentWidget.toggle();
+		//    }
+		//    this.searchTextDijit.set('value', value);
+		//    this.search();
+		//},
 
 		// Spatial Reference. uses the map's spatial reference if none provided
 		spatialReference: null,
-
 		// Use 0.0001 for decimal degrees (wkid 4326)
 		// or 500 for meters/feet
 		pointExtentSize: null,
+	    // default symbology for found features
 
-		// default symbology for found features
+		
 		defaultSymbols: {
 			point: {
 				type: 'esriSMS',
@@ -100,12 +114,22 @@ define([
 
 			this.createGraphicLayers();
 
+		    //amw decided they don't like the close of the widet to end the drawing.
 		    if (this.parentWidget && this.parentWidget.toggleable) {
 		        this.own(aspect.after(this.parentWidget, 'toggle', lang.hitch(this, function () {
 		            this.onLayoutChange(this.parentWidget.open);
 		        })));
 		    }
 
+            //amw added to fix ie bug
+		    this.own(aspect.after(this, 'resize', lang.hitch(this, function () {
+		        if (this.resultsGrid != 'undefined') {
+		            if (this.lastSort > "") {
+		                this.resultsGrid.updateSortArrow(this.lastSort, true);
+		            }
+		        }
+              })), true);
+		    
 		    // auto complete search 
 		    this.own(on(this.searchTextDijit, 'keyup', lang.hitch(this, function (evt) {
 		            this.handleOnKeyUp(evt);
@@ -130,6 +154,16 @@ define([
 				this.querySelectDom.style.display = 'none';
 			}
 
+		},
+		startup: function () {
+		    if (this.parcelid > "") {
+		        if (this.parentWidget && !this.parentWidget.open) {
+		            this.parentWidget.toggle();
+		        }
+		        this.searchTextDijit.set('value', this.parcelid);
+		        this.search();
+		    }
+		    
 		},
 		handleOnKeyUp: function (evt) {
 		    var id = evt.target.id;
@@ -246,6 +280,7 @@ define([
 		search: function () {
 			var selectedQuery = this.queries[this.queryIdx];
 			var searchText = this.searchTextDijit.get('value');
+			searchText = searchText.replace(/-/g, '') //amw remove dashes
 			if (!selectedQuery || !searchText || searchText.length === 0) {
 				return;
 			}
@@ -295,10 +330,19 @@ define([
 		        this.resultsGrid.updateSortArrow(selectedQuery.dgridSort, true);
 		    }
 
+
 		    if (!this.resultsGrid) {
-		        var Grid = declare([OnDemandGrid, Keyboard, Selection]);
+		        var Grid = declare([OnDemandGrid, Keyboard, Selection], {
+		            _customSelectionHandler: function(event, target){
+		                // Never clear for RMB, instead of clearing for RMB + unselected
+		                if(event.button !== 2 ){
+		                    this._singleSelectionHandler(event, target);
+		                }
+		                
+		            }});
+
 		        this.resultsGrid = new Grid({
-		            selectionMode: 'single',
+		            selectionMode: 'custom',
 		            cellNavigation: false,
 		            showHeader: true,
 		            store: this.resultsStore,
@@ -309,6 +353,16 @@ define([
 		        }, this.searchResultsGrid);
 		        this.resultsGrid.startup();
 		        this.resultsGrid.on('dgrid-select', lang.hitch(this, 'selectFeature'));
+		        this.resultsGrid.on('.dgrid-content .dgrid-row:contextmenu', lang.hitch(this, 'rightClickFeature'));
+		        this.resultsGrid.on('dgrid-sort', lang.hitch(this, 'setLastSort'));
+		    }
+
+		    if (!this.rcDialog) {
+		        this.rcDialog = new Dialog({
+		            title: "Right Click Dialog Column Name",
+		            content: "Column Value",
+		            style: "background-color:#FFFFFF; border-style:solid; border-width:2px; border-color:#000; height:150px; width:350px; padding:10px;"
+		        });
 		    }
 		    
 		},
@@ -433,7 +487,19 @@ define([
 					}
 				}
 			}
-		},
+        },
+        rightClickFeature: function (event) {
+            event.preventDefault();
+            var column = this.resultsGrid.cell(event).column.field;
+            var item = this.resultsGrid.row(event).data[column];
+            this.rcDialog.set("title", this.resultsGrid.cell(event).column.label);
+            this.rcDialog.set("content", item);
+            this.rcDialog.show();
+            //alert('Value of Column ' + column + ' is ' + item);
+        },
+        setLastSort: function (event) {
+            this.lastSort = event.sort;
+        },
 		zoomToExtent: function (extent) {
 			this.map.setExtent(extent.expand(3.0));
 		},
@@ -487,7 +553,7 @@ define([
 			if (queryIdx >= 0 && queryIdx < this.queries.length) {
 			    this.queryIdx = queryIdx;
 			    dojo.byId('searchTextDijit').focus();
-			    //this.createResultsGrid();
+			    dojo.byId('searchTextHelp').innerHTML = this.queries[queryIdx].help;
 			}
 		}
 	});
